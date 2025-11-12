@@ -9,19 +9,16 @@ export default function DashboardPage() {
       <Card className="w-[350px] bg-gray-800 border-gray-700 shadow-lg">
         <CardHeader>
           <CardTitle className="text-gray-100">Dashboard</CardTitle>
-          <CardDescription className="text-gray-400">Welcome to your inventory dashboard!</CardDescription>
+          <CardDescription className="text-gray-400">Welcome to your Hostel dashboard!</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="mb-4 text-gray-300">From here, you can manage your products and inventory.</p>
+          <p className="mb-4 text-gray-300">From Now, you can ease your Hostel life.</p>
           <div className="flex flex-col space-y-2">
             <Link href="/products" passHref>
               <Button className="w-full bg-gray-700 hover:bg-gray-600 text-gray-100 border border-gray-600">
-                View Products
+                View Yourself
               </Button>
             </Link>
-            <Button className="w-full bg-gray-700 hover:bg-gray-600 text-gray-100 border border-gray-600">
-              Add New Product
-            </Button>
             <Button className="w-full bg-red-600 hover:bg-red-700 text-gray-100 border border-red-500">
               Logout
             </Button>
