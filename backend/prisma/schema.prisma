@@ -1,30 +1,205 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(STUDENT)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  email       String        @unique
+  password    String
+  name        String
+  role        Role          @default(STUDENT)
+  roomNumber  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  complaints  Complaint[]
+  visitors    Visitor[]
+  leaves      Leave[]
+  feePayments FeePayment[]
+}
+
+model Room {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  roomNumber        String     @unique
+  floor             Int
+  capacity          Int
+  currentOccupancy  Int        @default(0)
+  status            RoomStatus @default(AVAILABLE)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+model Complaint {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  description     String
+  category        ComplaintCategory
+  status          ComplaintStatus   @default(PENDING)
+  studentId       String            @db.ObjectId
+  student         User              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  roomNumber      String
+  resolutionNotes String?
+  resolvedBy      String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Visitor {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  visitorName      String
+  visitorContact   String
+  purpose          String
+  studentId        String    @db.ObjectId
+  student          User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  roomNumber       String
+  entryTime        DateTime  @default(now())
+  exitTime         DateTime?
+  expectedDuration Int
+  createdAt        DateTime  @default(now())
+}
+
+model Leave {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  studentId       String      @db.ObjectId
+  student         User        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  roomNumber      String
+  startDate       DateTime
+  endDate         DateTime
+  reason          String
+  destination     String
+  status          LeaveStatus @default(PENDING)
+  approvedBy      String?
+  rejectionReason String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model MessMenu {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  day       DayOfWeek
+  mealType  MealType
+  items     String
+  weekStart DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  @@unique([day, mealType, weekStart])
+}
+
+model Announcement {
+  id            String               @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  content       String
+  priority      AnnouncementPriority @default(NORMAL)
+  createdBy     String
+  createdByName String
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+}
+
+model FeePayment {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  studentId       String           @db.ObjectId
+  student         User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  feeType         FeeType
+  amount          Float
+  dueDate         DateTime
+  paidDate        DateTime?
+  status          PaymentStatus    @default(PENDING)
+  transactionId   String?
+  paymentMethod   PaymentMethod?
+  semester        String
+  academicYear    String
+  remarks         String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 enum Role {
   ADMIN
   WARDEN
   STUDENT
+}
+
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+  RESERVED
+}
+
+enum ComplaintCategory {
+  MAINTENANCE
+  CLEANLINESS
+  FOOD
+  SECURITY
+  OTHER
+}
+
+enum ComplaintStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  SNACKS
+  DINNER
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum AnnouncementPriority {
+  NORMAL
+  IMPORTANT
+  URGENT
+}
+
+enum FeeType {
+  HOSTEL_FEE
+  MESS_FEE
+  MAINTENANCE_FEE
+  SECURITY_DEPOSIT
+  CAUTION_DEPOSIT
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+  PARTIALLY_PAID
+  WAIVED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  UPI
+  NET_BANKING
+  CHEQUE
+  DEMAND_DRAFT
 }
