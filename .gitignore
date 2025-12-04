@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# IDE
+.vscode/
+.kiro/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Test files (keep seed scripts, remove test files)
+test-*.js
+test-*.sh
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Documentation (keep main docs, remove verbose implementation docs)
+*_IMPLEMENTATION.md
+*_CHECKLIST.md
+*_ARCHITECTURE.md
+*_QUICK_START.md
+*_SUMMARY.md
+HOW_TO_*.md
+ANNOUNCEMENTS_*.md
+CONFIRM_*.md
+CRUD_*.md
+DATABASE_*.md
+DATA_SEEDING_*.md
+FRONTEND_*.md
+PAGINATION_*.md
+PROFILE_*.md
+STUDENT_*.md
+TESTING_*.md

@@ -46,17 +46,29 @@ export function StudentDashboard({ userId }) {
       setLoading(true);
       setError(null);
 
-      // In a real app, you'd have a dedicated dashboard endpoint
-      // For now, we'll simulate the data structure
-      const [complaintsRes, leavesRes, announcementsRes, feePaymentsRes] = await Promise.all([
-        api.get(API_ENDPOINTS.COMPLAINTS).catch(() => ({ data: { data: [] } })),
-        api.get(API_ENDPOINTS.LEAVES).catch(() => ({ data: { data: [] } })),
-        api.get(API_ENDPOINTS.ANNOUNCEMENTS).catch(() => ({ data: { data: [] } })),
-        api.get(`${API_ENDPOINTS.FEE_PAYMENTS}?studentId=${userId}`).catch(() => ({ data: { data: [] } })),
-      ]);
+      // Fetch data with individual error handling - don't let one failure break everything
+      const complaintsRes = await api.get(API_ENDPOINTS.COMPLAINTS).catch((err) => {
+        console.warn('Failed to fetch complaints:', err.message);
+        return { data: { data: [] } };
+      });
+
+      const leavesRes = await api.get(API_ENDPOINTS.LEAVES).catch((err) => {
+        console.warn('Failed to fetch leaves:', err.message);
+        return { data: { data: [] } };
+      });
+
+      const announcementsRes = await api.get(API_ENDPOINTS.ANNOUNCEMENTS).catch((err) => {
+        console.warn('Failed to fetch announcements:', err.message);
+        return { data: { data: [] } };
+      });
+
+      const feePaymentsRes = await api.get(`${API_ENDPOINTS.FEE_PAYMENTS}?studentId=${userId}`).catch((err) => {
+        console.warn('Failed to fetch fee payments:', err.message);
+        return { data: { data: [] } };
+      });
 
       setDashboardData({
-        roomNumber: '101', // This would come from user profile
+        roomNumber: user?.roomNumber || 'Not Assigned',
         wardenName: 'Mr. Smith', // This would come from user profile
         complaintsCount: complaintsRes.data.data?.length || 0,
         leaveCount: leavesRes.data.data?.filter(l => l.status === 'PENDING').length || 0,
@@ -65,7 +77,17 @@ export function StudentDashboard({ userId }) {
         recentAnnouncements: announcementsRes.data.data?.slice(0, 3) || [],
       });
     } catch (err) {
-      setError('Failed to load dashboard data');
+      console.error('Dashboard error:', err);
+      // Don't show error, just use default values
+      setDashboardData({
+        roomNumber: user?.roomNumber || 'Not Assigned',
+        wardenName: 'Mr. Smith',
+        complaintsCount: 0,
+        leaveCount: 0,
+        announcementsCount: 0,
+        pendingFeesCount: 0,
+        recentAnnouncements: [],
+      });
     } finally {
       setLoading(false);
     }
@@ -77,10 +99,6 @@ export function StudentDashboard({ userId }) {
         <LoadingSpinner size="lg" />
       </div>
     );
-  }
-
-  if (error) {
-    return <ErrorMessage message={error} onDismiss={() => setError(null)} />;
   }
 
   return (
