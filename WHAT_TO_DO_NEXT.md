@@ -52,16 +52,27 @@ node test-deployment.js
 
 ---
 
-### 4️⃣ Update Vercel Environment Variable (2 minutes)
+### 4️⃣ Fix Vercel Configuration (5 minutes)
+
+**IMPORTANT:** Vercel needs to build from the `frontend` directory!
 
 1. Go to: https://vercel.com/dashboard
 2. Click your project
-3. Go to: **Settings** → **Environment Variables**
-4. Find `NEXT_PUBLIC_API_URL` or add it:
+3. Go to: **Settings**
+4. Find **"Root Directory"** section
+5. Click **"Edit"**
+6. Set to: `frontend`
+7. Click **"Save"**
+
+Then add environment variable:
+1. Go to: **Settings** → **Environment Variables**
+2. Add:
    ```
    NEXT_PUBLIC_API_URL=https://hostel-ease.onrender.com
    ```
-5. Click **Save**
+3. Click **"Save"**
+
+**See VERCEL_FIX_GUIDE.md for detailed steps**
 
 ---
 

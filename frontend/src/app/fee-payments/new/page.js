@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { ErrorMessage } from '@/components/common/ErrorMessage';
-import { useAuth } from '@/hooks/useAuth';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute.jsx';
+import { DashboardLayout } from '@/components/layout/DashboardLayout.jsx';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card.jsx';
+import { Button } from '@/components/ui/button.jsx';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner.jsx';
+import { ErrorMessage } from '@/components/common/ErrorMessage.jsx';
+import { useAuth } from '@/hooks/useAuth.js';
 import api from '@/lib/api';
 import { API_ENDPOINTS, FEE_TYPES } from '@/constants/apiEndpoints';
 import { ROUTES } from '@/constants/routes';
