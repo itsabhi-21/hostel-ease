@@ -11,11 +11,11 @@ import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { Pagination } from '@/components/common/Pagination';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { useNotification } from '@/context/NotificationContext';
-import { Plus } from 'lucide-react';
+import { Plus, Filter, Search, X } from 'lucide-react';
 import { useAuth, useRole } from '@/hooks/useAuth';
 import { ROUTES } from '@/constants/routes';
 import api from '@/lib/api';
-import { API_ENDPOINTS } from '@/constants/apiEndpoints';
+import { API_ENDPOINTS, COMPLAINT_STATUS, COMPLAINT_CATEGORIES } from '@/constants/apiEndpoints';
 
 export default function ComplaintsPage() {
   const router = useRouter();
@@ -32,6 +32,11 @@ export default function ComplaintsPage() {
     page: 1,
     limit: 6
   });
+  const [filters, setFilters] = useState({
+    status: '',
+    category: '',
+    search: ''
+  });
   const [deleteDialog, setDeleteDialog] = useState({
     isOpen: false,
     complaintId: null
@@ -39,15 +44,22 @@ export default function ComplaintsPage() {
 
   useEffect(() => {
     fetchComplaints();
-  }, [currentPage]);
+  }, [currentPage, filters]);
 
   const fetchComplaints = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // All users (including students) can see all complaints
-      const response = await api.get(`${API_ENDPOINTS.COMPLAINTS}?page=${currentPage}&limit=6`);
+      const params = new URLSearchParams();
+      params.append('page', currentPage);
+      params.append('limit', 6);
+      
+      if (filters.status) params.append('status', filters.status);
+      if (filters.category) params.append('category', filters.category);
+      if (filters.search) params.append('search', filters.search);
+
+      const response = await api.get(`${API_ENDPOINTS.COMPLAINTS}?${params}`);
       setComplaints(response.data.data || []);
       
       if (response.data.pagination) {
@@ -134,6 +146,65 @@ export default function ComplaintsPage() {
                 New Complaint
               </Button>
             )}
+          </div>
+
+          {/* Filters and Search */}
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Search */}
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search complaints..."
+                    value={filters.search}
+                    onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Status Filter */}
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800"
+              >
+                <option value="">All Statuses</option>
+                {Object.keys(COMPLAINT_STATUS).map((status) => (
+                  <option key={status} value={status}>
+                    {status.replace('_', ' ')}
+                  </option>
+                ))}
+              </select>
+
+              {/* Category Filter */}
+              <select
+                value={filters.category}
+                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800"
+              >
+                <option value="">All Categories</option>
+                {Object.keys(COMPLAINT_CATEGORIES).map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+
+              {/* Clear Filters */}
+              {(filters.status || filters.category || filters.search) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setFilters({ status: '', category: '', search: '' })}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Clear
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Content */}

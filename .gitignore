@@ -51,6 +51,9 @@ out/
 *_ARCHITECTURE.md
 *_QUICK_START.md
 *_SUMMARY.md
+*_STATUS.md
+*_AUDIT.md
+*_PLAN.md
 HOW_TO_*.md
 ANNOUNCEMENTS_*.md
 CONFIRM_*.md
@@ -62,3 +65,5 @@ PAGINATION_*.md
 PROFILE_*.md
 STUDENT_*.md
 TESTING_*.md
+QUICK_FIX.txt
+test-deployment.js

@@ -11,9 +11,20 @@ import announcementRoutes from './routes/announcements.js';
 import feePaymentRoutes from './routes/feePayments.js';
 
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
-app.use(cors());
+// CORS configuration for production
+app.use(cors({
+    origin: [
+        'http://localhost:3000',
+        'https://hostel-ease-phi.vercel.app',
+        'https://hostel-ease.onrender.com'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 app.get('/', (req, res) => {
