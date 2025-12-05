@@ -39,6 +39,13 @@ export default function RoomsPage() {
     isOpen: false,
     roomId: null
   });
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createFormData, setCreateFormData] = useState({
+    roomNumber: '',
+    floor: '1',
+    capacity: '2',
+    type: 'SHARED'
+  });
 
   useEffect(() => {
     fetchRooms();
@@ -106,6 +113,34 @@ export default function RoomsPage() {
     }
   };
 
+  const handleCreateRoom = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      // Convert strings to numbers for API
+      const roomData = {
+        ...createFormData,
+        floor: parseInt(createFormData.floor),
+        capacity: parseInt(createFormData.capacity)
+      };
+      await api.post(API_ENDPOINTS.ROOMS, roomData);
+      showSuccess('Room created successfully');
+      setShowCreateModal(false);
+      setCreateFormData({
+        roomNumber: '',
+        floor: '1',
+        capacity: '2',
+        type: 'SHARED'
+      });
+      fetchRooms();
+    } catch (err) {
+      console.error('Error creating room:', err);
+      showSuccess('Failed to create room', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.WARDEN]}>
       <DashboardLayout>
@@ -120,7 +155,7 @@ export default function RoomsPage() {
                 Manage hostel rooms and assignments
               </p>
             </div>
-            <Button className="gap-2">
+            <Button className="gap-2" onClick={() => setShowCreateModal(true)}>
               <Plus className="h-4 w-4" />
               Add Room
             </Button>
@@ -167,6 +202,97 @@ export default function RoomsPage() {
           cancelText="Cancel"
           variant="danger"
         />
+
+        {/* Create Room Modal */}
+        {showCreateModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">Create New Room</h2>
+              <form onSubmit={handleCreateRoom} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Room Number *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={createFormData.roomNumber}
+                    onChange={(e) => setCreateFormData({ ...createFormData, roomNumber: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    placeholder="e.g., 101"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Floor *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={createFormData.floor}
+                    onChange={(e) => setCreateFormData({ ...createFormData, floor: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    placeholder="e.g., 1"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Capacity *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    max="4"
+                    value={createFormData.capacity}
+                    onChange={(e) => setCreateFormData({ ...createFormData, capacity: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Room Type *
+                  </label>
+                  <select
+                    required
+                    value={createFormData.type}
+                    onChange={(e) => setCreateFormData({ ...createFormData, type: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="SINGLE">Single</option>
+                    <option value="SHARED">Shared</option>
+                    <option value="SUITE">Suite</option>
+                  </select>
+                </div>
+
+                <div className="flex gap-3 justify-end pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowCreateModal(false);
+                      setCreateFormData({
+                        roomNumber: '',
+                        floor: '1',
+                        capacity: '2',
+                        type: 'SHARED'
+                      });
+                    }}
+                    disabled={loading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={loading}>
+                    {loading ? 'Creating...' : 'Create Room'}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </DashboardLayout>
     </ProtectedRoute>
   );

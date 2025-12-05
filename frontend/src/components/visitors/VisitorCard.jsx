@@ -1,15 +1,18 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, User, Home, Calendar, Clock } from 'lucide-react';
+import { Users, User, Home, Calendar, Clock, Edit2 } from 'lucide-react';
 import { formatDateTime } from '@/lib/validators';
 import { useRole } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/constants/routes';
 
 export function VisitorCard({ visitor, onMarkExit }) {
   const { isStaff } = useRole();
+  const router = useRouter();
   const isActive = !visitor.exitTime;
 
   return (
-    <Card>
+    <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push(`/visitors/${visitor.id}`)}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-lg flex items-center gap-2">
@@ -50,15 +53,34 @@ export function VisitorCard({ visitor, onMarkExit }) {
           <p className="text-sm text-gray-900 dark:text-gray-100">{visitor.purpose}</p>
         </div>
 
-        {isStaff && isActive && onMarkExit && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onMarkExit(visitor.id)}
-            className="w-full"
-          >
-            Mark Exit
-          </Button>
+        {isStaff && (
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/visitors/${visitor.id}`);
+              }}
+              className="flex-1"
+            >
+              <Edit2 className="h-3 w-3 mr-1" />
+              Edit
+            </Button>
+            {isActive && onMarkExit && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMarkExit(visitor.id);
+                }}
+                className="flex-1"
+              >
+                Mark Exit
+              </Button>
+            )}
+          </div>
         )}
       </CardContent>
     </Card>

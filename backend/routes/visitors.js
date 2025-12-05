@@ -124,6 +124,35 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Update visitor details
+router.put('/:id', async (req, res) => {
+    try {
+        const { visitorName, visitorPhone, purpose, checkOutTime, status } = req.body;
+        
+        const updateData = {};
+        if (visitorName) updateData.visitorName = visitorName;
+        if (visitorPhone) updateData.visitorContact = visitorPhone;
+        if (purpose) updateData.purpose = purpose;
+        if (checkOutTime) updateData.exitTime = new Date(checkOutTime);
+        if (status) updateData.status = status;
+        
+        const visitor = await prisma.visitor.update({
+            where: { id: req.params.id },
+            data: updateData,
+            include: {
+                student: {
+                    select: { name: true }
+                }
+            }
+        });
+        
+        res.json({ success: true, data: { ...visitor, studentName: visitor.student?.name || 'Unknown Student' } });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
 // Mark visitor exit
 router.put('/:id/exit', async (req, res) => {
     try {

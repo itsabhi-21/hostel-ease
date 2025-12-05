@@ -54,6 +54,8 @@ out/
 *_STATUS.md
 *_AUDIT.md
 *_PLAN.md
+*_COMPLETE.md
+*_RESULTS.md
 HOW_TO_*.md
 ANNOUNCEMENTS_*.md
 CONFIRM_*.md
@@ -65,5 +67,7 @@ PAGINATION_*.md
 PROFILE_*.md
 STUDENT_*.md
 TESTING_*.md
+EDIT_*.md
+READY_*.md
 QUICK_FIX.txt
 test-deployment.js
